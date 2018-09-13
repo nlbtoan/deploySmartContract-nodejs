@@ -1,0 +1,60 @@
+this.ipfs.addJSON(req.body, async (err, result) => {});
+
+######################################################
+
+if (result) {
+	const accounts = await web3.eth.getAccounts();
+	goodschain.options.gasPrice = (process.env.GAS_PRICE).toString();
+	goodschain.options.gas = process.env.GAS_LIMIT;
+	const data = await goodschain.methods.addHash(req.body.batch, req.body.stage, result).send({
+	  from: accounts[0],
+	});
+	} else {
+	console.log(err);
+}
+  
+######################################################
+  
+if (data) {
+  delete req.body.xmlFile;
+  req.body.hash = result;
+  req.body.txHash = data.transactionHash;
+  const obj = new this.model(req.body);
+  obj.save((error, item) => {
+	if (error && error.code === 11000) {
+	  res.sendStatus(400).json(error);
+	} else {
+	  res.status(200).json(item);
+	}
+  });
+} else {
+  res.sendStatus(403);
+}
+
+######################################################
+######################################################
+
+getData = (req, res) => {
+	this.ipfs.catJSON(req.body.hash, (err, result) => {
+	  if (result) {
+		res.status(200).json(result);
+	  } else {
+		res.sendStatus(403).json(err);
+	  }
+	});
+}
+
+######################################################
+######################################################
+
+verifyData = async (req, res) => {
+	goodschain.options.gasPrice = (process.env.GAS_PRICE).toString();
+	goodschain.options.gas = process.env.GAS_LIMIT;
+	const data = await goodschain.methods.verifyHash(req.body.batch, req.body.stage, req.body.hash).call();
+
+	if (data) {
+	  res.status(200).json(data);
+	} else {
+	  res.sendStatus(403);
+	}
+}

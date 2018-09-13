@@ -3,8 +3,8 @@ const Web3 = require('web3');
 const { interface, bytecode } = require('./compile');
 
 const provider = new HDWalletProvider(
-    'null',
-    'null'
+    'arctic pond mail snow night crash wild away cupboard author extra deny',
+    'https://rinkeby.infura.io/PMGUsFXUFQnjmmHjqaVm'
 );
 const web3 = new Web3(provider);
 
